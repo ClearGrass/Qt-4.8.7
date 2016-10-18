@@ -1,0 +1,16 @@
+/InspectorClientQt.moc
+/moc_FrameLoaderClientQt.cpp
+/moc_IconDatabaseClientQt.cpp
+/moc_InspectorServerQt.cpp
+/moc_NotificationPresenterClientQt.cpp
+/moc_PopupMenuQt.cpp
+/moc_QtFallbackWebPopup.cpp
+/moc_qgraphicswebview.cpp
+/moc_qwebframe.cpp
+/moc_qwebhistoryinterface.cpp
+/moc_qwebinspector.cpp
+/moc_qwebkitplatformplugin.cpp
+/moc_qwebpage.cpp
+/moc_qwebplugindatabase_p.cpp
+/moc_qwebpluginfactory.cpp
+/moc_qwebview.cpp

@@ -1,0 +1,15 @@
+/cppextractimages.o
+/cppwritedeclaration.o
+/cppwriteicondata.o
+/cppwriteicondeclaration.o
+/cppwriteiconinitialization.o
+/cppwriteincludes.o
+/cppwriteinitialization.o
+/customwidgetsinfo.o
+/databaseinfo.o
+/driver.o
+/main.o
+/treewalker.o
+/ui4.o
+/uic.o
+/validator.o

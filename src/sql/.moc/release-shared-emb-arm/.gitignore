@@ -1,0 +1,6 @@
+/moc_qsql_sqlite.cpp
+/moc_qsqldriver.cpp
+/moc_qsqldriverplugin.cpp
+/moc_qsqlquerymodel.cpp
+/moc_qsqlrelationaltablemodel.cpp
+/moc_qsqltablemodel.cpp

@@ -1,0 +1,8 @@
+/deviceorientation.moc
+/main.moc
+/moc_deviceorientation.cpp
+/moc_loggerwidget.cpp
+/moc_proxysettings.cpp
+/moc_qdeclarativetester.cpp
+/moc_qmlruntime.cpp
+/qmlruntime.moc

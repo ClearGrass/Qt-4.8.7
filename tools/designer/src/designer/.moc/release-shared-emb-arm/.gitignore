@@ -1,0 +1,17 @@
+/moc_appfontdialog.cpp
+/moc_fontpanel.cpp
+/moc_mainwindow.cpp
+/moc_newform.cpp
+/moc_preferencesdialog.cpp
+/moc_qdesigner.cpp
+/moc_qdesigner_actions.cpp
+/moc_qdesigner_appearanceoptions.cpp
+/moc_qdesigner_formwindow.cpp
+/moc_qdesigner_server.cpp
+/moc_qdesigner_toolwindow.cpp
+/moc_qdesigner_workbench.cpp
+/moc_qttoolbardialog.cpp
+/moc_saveformastemplate.cpp
+/moc_versiondialog.cpp
+/qttoolbardialog.moc
+/versiondialog.moc

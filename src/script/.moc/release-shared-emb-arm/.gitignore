@@ -1,0 +1,5 @@
+/MainThreadQt.moc
+/ThreadingQt.moc
+/moc_qscriptengine.cpp
+/moc_qscriptextensionplugin.cpp
+/moc_qscriptqobject_p.cpp

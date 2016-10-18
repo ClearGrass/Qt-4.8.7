@@ -1,0 +1,11 @@
+/moc_abstractliveedittool.cpp
+/moc_abstracttool.cpp
+/moc_abstractviewinspector.cpp
+/moc_boundingrecthighlighter.cpp
+/moc_colorpickertool.cpp
+/moc_liveselectiontool.cpp
+/moc_qdeclarativeinspectorplugin.cpp
+/moc_qdeclarativeinspectorprotocol.cpp
+/moc_qdeclarativeviewinspector.cpp
+/moc_qdeclarativeviewinspector_p.cpp
+/moc_zoomtool.cpp

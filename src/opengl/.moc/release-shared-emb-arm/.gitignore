@@ -1,0 +1,6 @@
+/moc_qgl.cpp
+/moc_qgl_p.cpp
+/moc_qglengineshadermanager_p.cpp
+/moc_qglshaderprogram.cpp
+/moc_qgraphicsshadereffect_p.cpp
+/moc_qwindowsurface_gl_p.cpp

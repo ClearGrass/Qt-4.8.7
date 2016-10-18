@@ -1,0 +1,7 @@
+/GraphicsLayerQt.moc
+/SharedTimerQt.moc
+/moc_DnsPrefetchHelper.cpp
+/moc_NetworkStateNotifierPrivate.cpp
+/moc_QNetworkReplyHandler.cpp
+/moc_QtMIMETypeSniffer.cpp
+/moc_SocketStreamHandlePrivate.cpp

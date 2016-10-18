@@ -1,0 +1,13 @@
+/deviceorientation.o
+/loggerwidget.o
+/main.o
+/moc_deviceorientation.o
+/moc_loggerwidget.o
+/moc_proxysettings.o
+/moc_qdeclarativetester.o
+/moc_qmlruntime.o
+/proxysettings.o
+/qdeclarativetester.o
+/qmlruntime.o
+/qrc_browser.o
+/qrc_startup.o

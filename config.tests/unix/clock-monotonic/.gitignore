@@ -1,0 +1,4 @@
+/.qmake.cache
+/Makefile
+/clock-monotonic
+/clock-monotonic.o

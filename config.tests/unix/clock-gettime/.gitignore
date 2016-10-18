@@ -1,0 +1,4 @@
+/.qmake.cache
+/Makefile
+/clock-gettime
+/clock-gettime.o
