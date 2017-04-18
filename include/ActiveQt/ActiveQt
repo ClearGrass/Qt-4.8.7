@@ -5,8 +5,8 @@
 #include "qaxscript.h"
 #include "qaxselect.h"
 #include "qaxwidget.h"
+#include "qaxtypes.h"
 #include "qaxaggregated.h"
 #include "qaxbindable.h"
 #include "qaxfactory.h"
-#include "qaxtypes.h"
 #endif
