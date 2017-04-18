@@ -346,7 +346,15 @@ void QWSServerPrivate::initializeCursor()
     cursor = 0;
     setCursor(QWSCursor::systemCursor(Qt::ArrowCursor));
 #endif
+#if 0 //modify by leo 2017.04.12
+
     q->sendMouseEvent(QPoint(swidth/2, sheight/2), 0);
+
+#else
+
+	q->sendMouseEvent(QPoint(swidth, sheight), 0);
+
+#endif
 }
 
 void QWSServerPrivate::setCursor(QWSCursor *curs)
