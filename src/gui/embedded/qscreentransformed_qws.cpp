@@ -58,6 +58,7 @@
 
 #include <qwindowsystem_qws.h>
 #include <qwsdisplay_qws.h>
+#include <qdebug.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -330,11 +331,16 @@ template <class DST, class SRC>
 static inline void blit270(QScreen *screen, const QImage &image,
                            const QRect &rect, const QPoint &topLeft)
 {
+    qDebug("---blit270 begin---topLeft.y() >> rect.top(),topLeft.x() >>rect.left() ");    
     const SRC *src = (const SRC *)(image.scanLine(rect.top())) + rect.left();
-    DST *dest = (DST*)(screen->base() + topLeft.y() * screen->linestep())
-                + topLeft.x();
+//    DST *dest = (DST*)(screen->base() + topLeft.y() * screen->linestep())
+//                + topLeft.x();
+    DST *dest = (DST*)(screen->base() + rect.top() * screen->linestep())
+                + rect.left();
     qt_memrotate270(src, rect.width(), rect.height(), image.bytesPerLine(),
                     dest, screen->linestep());
+    qDebug("Image --- %p",&image);
+    qDebug("---blit270 end---");
 }
 
 typedef void (*BlitFunc)(QScreen *, const QImage &, const QRect &, const QPoint &);
@@ -362,9 +368,12 @@ do {                                            \
 void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
                               const QRegion &region)
 {
+    qDebug("---blit begin---");
+    qDebug("Image --- %p",&image);
     const Transformation trans = d_ptr->transformation;
     if (trans == None) {
         QProxyScreen::blit(image, topLeft, region);
+	qDebug("---blit end---");
         return;
     }
 
@@ -431,11 +440,14 @@ void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
         break;
 #endif
     default:
+	qDebug("---blit end---");
         return;
     }
     if (!func)
+    {
+	qDebug("---blit end---");
         return;
-
+    }
     QWSDisplay::grab();
     for (int i = 0; i < rects.size(); ++i) {
         const QRect r = rects.at(i) & bound;
@@ -457,6 +469,7 @@ void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
         func(this, image, r.translated(-topLeft), dst);
     }
     QWSDisplay::ungrab();
+    qDebug("---blit end---");
 
 }
 

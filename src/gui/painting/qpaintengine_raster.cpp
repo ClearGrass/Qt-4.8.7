@@ -114,7 +114,6 @@ Q_GUI_EXPORT extern bool qt_scaleForTransform(const QTransform &transform, qreal
 #define qt_swap_int(x, y) { int tmp = (x); (x) = (y); (y) = tmp; }
 #define qt_swap_qreal(x, y) { qreal tmp = (x); (x) = (y); (y) = tmp; }
 
-// #define QT_DEBUG_DRAW
 #ifdef QT_DEBUG_DRAW
 void dumpClip(int width, int height, const QClipData *clip);
 #endif
@@ -236,12 +235,13 @@ static void qt_debug_path(const QPainterPath &path)
         "CurveTo    ",
         "CurveToData"
     };
-
-    fprintf(stderr,"\nQPainterPath: elementCount=%d\n", path.elementCount());
+    qDebug("QPainterPath: elementCount=%d", path.elementCount());
+//    fprintf(stderr,"\nQPainterPath: elementCount=%d\n", path.elementCount());
     for (int i=0; i<path.elementCount(); ++i) {
         const QPainterPath::Element &e = path.elementAt(i);
         Q_ASSERT(e.type >= 0 && e.type <= QPainterPath::CurveToDataElement);
-        fprintf(stderr," - %3d:: %s, (%.2f, %.2f)\n", i, names[e.type], e.x, e.y);
+//        fprintf(stderr," - %3d:: %s, (%.2f, %.2f)\n", i, names[e.type], e.x, e.y);
+        qDebug(" - %3d:: %s, (%.2f, %.2f)", i, names[e.type], e.x, e.y);
     }
 }
 #endif
@@ -384,7 +384,7 @@ void QRasterPaintEngine::init()
         break;
 #endif
     default:
-        qWarning("QRasterPaintEngine: unsupported target device %d\n", d->device->devType());
+        qWarning("QRasterPaintEngine: unsupported target device %d", d->device->devType());
         d->device = 0;
         return;
     }
@@ -1129,10 +1129,14 @@ static void checkClipRatios(QRasterPaintEnginePrivate *d)
     totalClips++;
 
     if ((totalClips % 5000) == 0) {
-        printf("Clipping ratio: rectangular=%f%%, region=%f%%, complex=%f%%\n",
+	qDebug("Clipping ratio: rectangular=%f%%, region=%f%%, complex=%f%%",
                rectClips * 100.0 / (qreal) totalClips,
                regionClips * 100.0 / (qreal) totalClips,
                (totalClips - rectClips - regionClips) * 100.0 / (qreal) totalClips);
+//        printf("Clipping ratio: rectangular=%f%%, region=%f%%, complex=%f%%\n",
+//               rectClips * 100.0 / (qreal) totalClips,
+//               regionClips * 100.0 / (qreal) totalClips,
+//               (totalClips - rectClips - regionClips) * 100.0 / (qreal) totalClips);
         totalClips = 0;
         rectClips = 0;
         regionClips = 0;
@@ -2157,24 +2161,38 @@ static inline const QRect toAlignedRect_positive(const QRectF &rect)
 void QRasterPaintEngine::drawImage(const QPointF &p, const QImage &img)
 {
 #ifdef QT_DEBUG_DRAW
-    qDebug() << " - QRasterPaintEngine::drawImage(), p=" <<  p << " image=" << img.size() << "depth=" << img.depth();
+    qDebug() << " - QRasterPaintEngine::drawImage()-2, p=" <<  p << " image=" << img.size() << "depth=" << img.depth();
 #endif
 
     Q_D(QRasterPaintEngine);
     QRasterPaintEngineState *s = state();
 
     if (s->matrix.type() > QTransform::TxTranslate) {
+#ifdef QT_DEBUG_DRAW 
+    qDebug() << "QRasterPaintEngine::drawImage()-2,s->matrix.type() > QTransform::TxTranslate" << endl;
+#endif
         drawImage(QRectF(p.x(), p.y(), img.width(), img.height()),
                   img,
                   QRectF(0, 0, img.width(), img.height()));
     } else {
 
+#ifdef QT_DEBUG_DRAW 
+    qDebug() << "QRasterPaintEngine::drawImage()-2,s->matrix.type() < QTransform::TxTranslate" << endl;
+#endif
         const QClipData *clip = d->clip();
         QPointF pt(p.x() + s->matrix.dx(), p.y() + s->matrix.dy());
 
         if (d->canUseFastImageBlending(d->rasterBuffer->compositionMode, img)) {
+#ifdef QT_DEBUG_DRAW 
+    qDebug() << "QRasterPaintEngine::drawImage()-2,canUseFastImageBlending() != NULL" << endl;
+    qDebug("d->rasterBuffer->format:[%d],img.format:[%d]",d->rasterBuffer->format,img.format());
+#endif
             SrcOverBlendFunc func = qBlendFunctions[d->rasterBuffer->format][img.format()];
             if (func) {
+#ifdef QT_DEBUG_DRAW 
+    qDebug() << "QRasterPaintEngine::drawImage()-2,func != NULL" << endl;
+#endif
+
                 if (!clip) {
                     d->drawImage(pt, img, func, d->deviceRect, s->intOpacity);
                     return;
@@ -2247,12 +2265,15 @@ void QRasterPaintEngine::drawImage(const QRectF &r, const QImage &img, const QRe
                                    Qt::ImageConversionFlags)
 {
 #ifdef QT_DEBUG_DRAW
-    qDebug() << " - QRasterPaintEngine::drawImage(), r=" << r << " sr=" << sr << " image=" << img.size() << "depth=" << img.depth();
+    qDebug() << " - QRasterPaintEngine::drawImage()-3, r=" << r << " sr=" << sr << " image=" << img.size() << "depth=" << img.depth();
 #endif
 
-    if (r.isEmpty())
-        return;
-
+    if (r.isEmpty()){
+#ifdef QT_DEBUG_DRAW
+    qDebug() << " - QRasterPaintEngine::drawImage()-3, r.isEmpty()";
+#endif
+	return;
+    }
     Q_D(QRasterPaintEngine);
     QRasterPaintEngineState *s = state();
     int sr_l = qFloor(sr.left());
@@ -2261,6 +2282,10 @@ void QRasterPaintEngine::drawImage(const QRectF &r, const QImage &img, const QRe
     int sr_b = qCeil(sr.bottom()) - 1;
 
     if (s->matrix.type() <= QTransform::TxScale && !s->flags.antialiased && sr_l == sr_r && sr_t == sr_b) {
+
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,s->matrix.type() <= QTransform::TxScale && !s->flags.antialiased && sr_l == sr_r && sr_t == sr_b" << endl;
+#endif
         // as fillRect will apply the aliased coordinate delta we need to
         // subtract it here as we don't use it for image drawing
         QTransform old = s->matrix;
@@ -2313,17 +2338,30 @@ void QRasterPaintEngine::drawImage(const QRectF &r, const QImage &img, const QRe
             || (d->rasterBuffer->format == QImage::Format_ARGB32_Premultiplied
                 && d->rasterBuffer->compositionMode == QPainter::CompositionMode_Source)))
     {
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,s->matrix.type() > QTransform::TxTranslae && !stretch_sr && (!clip || clip->hasRectClip) && ..." << endl;
+#endif
         RotationType rotationType = qRotationType(s->matrix);
 
         if (rotationType != NoRotation && qMemRotateFunctions[d->rasterBuffer->format][rotationType] && img.rect().contains(sr.toAlignedRect())) {
             QRectF transformedTargetRect = s->matrix.mapRect(r);
-
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,rotationType != NoRotation && qMemRotateFunctions[d->rasterBuffer->format][rotationType] && ..." << endl;
+#endif
             if ((!(s->renderHints & QPainter::SmoothPixmapTransform) && !(s->renderHints & QPainter::Antialiasing))
                 || (isPixelAligned(transformedTargetRect) && isPixelAligned(sr)))
             {
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,(!(s->renderHints & QPainter::SmoothPixmapTransform) && !(s->renderHints & QPainter::Antialiasing)) || ..." << endl;
+#endif
                 QRect clippedTransformedTargetRect = transformedTargetRect.toRect().intersected(clip ? clip->clipRect : d->deviceRect);
-                if (clippedTransformedTargetRect.isNull())
-                    return;
+                if (clippedTransformedTargetRect.isNull()){
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,clippedTransformedTargetRect.isNull()" << endl;
+#endif
+		    return;
+		}
+                    
 
                 QRectF clippedTargetRect = s->matrix.inverted().mapRect(QRectF(clippedTransformedTargetRect));
 
@@ -2351,23 +2389,42 @@ void QRasterPaintEngine::drawImage(const QRectF &r, const QImage &img, const QRe
     }
 
     if (s->matrix.type() > QTransform::TxTranslate || stretch_sr) {
-
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,s->matrix.type() > QTransform::TxTranslate || stretch_sr" << endl;
+#endif
         QRectF targetBounds = s->matrix.mapRect(r);
         bool exceedsPrecision = targetBounds.width() > 0xffff
                                 || targetBounds.height() > 0xffff;
 
         if (!exceedsPrecision && d->canUseFastImageBlending(d->rasterBuffer->compositionMode, img)) {
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,!exceedsPrecision && d->canUseFastImageBlending(d->rasterBuffer->compositionMode, img)" << endl;
+#endif
             if (s->matrix.type() > QTransform::TxScale) {
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,s->matrix.type() > QTransform::TxScale" << endl;
+    qDebug("d->rasterBuffer->format:[%d],img.format:[%d]",d->rasterBuffer->format,img.format());
+#endif
                 SrcOverTransformFunc func = qTransformFunctions[d->rasterBuffer->format][img.format()];
                 if (func && (!clip || clip->hasRectClip)) {
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,func && (!clip || clip->hasRectClip)" << endl;
+#endif
                     func(d->rasterBuffer->buffer(), d->rasterBuffer->bytesPerLine(), img.bits(),
                          img.bytesPerLine(), r, sr, !clip ? d->deviceRect : clip->clipRect,
                          s->matrix, s->intOpacity);
                     return;
                 }
             } else {
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,s->matrix.type() <= QTransform::TxScale" << endl;
+    qDebug("d->rasterBuffer->format:[%d],img.format:[%d]",d->rasterBuffer->format,img.format());
+#endif
                 SrcOverScaleFunc func = qScaleFunctions[d->rasterBuffer->format][img.format()];
                 if (func && (!clip || clip->hasRectClip)) {
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,func && (!clip || clip->hasRectClip)" << endl;
+#endif
                     func(d->rasterBuffer->buffer(), d->rasterBuffer->bytesPerLine(),
                          img.bits(), img.bytesPerLine(), img.height(),
                          qt_mapRect_non_normalizing(r, s->matrix), sr,
@@ -2387,10 +2444,19 @@ void QRasterPaintEngine::drawImage(const QRectF &r, const QImage &img, const QRe
         d->image_filler_xform.clip = clip;
         d->image_filler_xform.initTexture(&img, s->intOpacity, QTextureData::Plain, toAlignedRect_positive(sr));
         if (!d->image_filler_xform.blend)
-            return;
+	{
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,!d->image_filler_xform.blend" << endl;
+#endif
+	    return;
+	}
+            
         d->image_filler_xform.setupMatrix(copy, s->flags.bilinear);
 
         if (!s->flags.antialiased && s->matrix.type() == QTransform::TxScale) {
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,!s->flags.antialiased && s->matrix.type() == QTransform::TxScale" << endl;
+#endif
             QPointF rr_tl = s->matrix.map(r.topLeft());
             QPointF rr_br = s->matrix.map(r.bottomRight());
 
@@ -2411,6 +2477,9 @@ void QRasterPaintEngine::drawImage(const QRectF &r, const QImage &img, const QRe
 #ifdef QT_FAST_SPANS
         ensureState();
         if (s->flags.tx_noshear || s->matrix.type() == QTransform::TxScale) {
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,s->flags.tx_noshear || s->matrix.type() == QTransform::TxScale" << endl;
+#endif
             d->initializeRasterizer(&d->image_filler_xform);
             d->rasterizer->setAntialiased(s->flags.antialiased);
 
@@ -2437,14 +2506,39 @@ void QRasterPaintEngine::drawImage(const QRectF &r, const QImage &img, const QRe
         fillPath(path, &d->image_filler_xform);
         s->matrix = m;
     } else {
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,s->matrix.type() <= QTransform::TxTranslate && stretch_sr" << endl;
+#endif
         if (d->canUseFastImageBlending(d->rasterBuffer->compositionMode, img)) {
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,d->canUseFastImageBlending(d->rasterBuffer->compositionMode, img) != NULL" << endl;
+    qDebug("d->rasterBuffer->format:[%d],img.format:[%d]",d->rasterBuffer->format,img.format());
+#endif
             SrcOverBlendFunc func = qBlendFunctions[d->rasterBuffer->format][img.format()];
-            if (func) {
+	    if(img.width() == 854 && img.height() == 480)
+	    {
+#ifdef QT_DEBUG_DRAW
+    qDebug()<<"QRasterPaintEngine::drawImage()-3,img.width() == 854 && img.height() == 480";
+    qDebug("func = qBlendFunctions[d->rasterBuffer->format][QImage::Format_RGB32];");
+#endif
+		func = qBlendFunctions[d->rasterBuffer->format][QImage::Format_RGB32];
+	    }
+                
+            if (func) {		
+#ifdef QT_DEBUG_DRAW 
+    qDebug() << "QRasterPaintEngine::drawImage()-3,func != NULL" << endl;
+#endif
                 QPointF pt(r.x() + s->matrix.dx(), r.y() + s->matrix.dy());
                 if (!clip) {
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,clip == NULL" << endl;
+#endif
                     d->drawImage(pt, img, func, d->deviceRect, s->intOpacity, sr.toRect());
                     return;
                 } else if (clip->hasRectClip) {
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,clip != NULL && clip->hasRectClip " << endl;
+#endif
                     d->drawImage(pt, img, func, clip->clipRect, s->intOpacity, sr.toRect());
                     return;
                 }
@@ -2453,8 +2547,12 @@ void QRasterPaintEngine::drawImage(const QRectF &r, const QImage &img, const QRe
 
         d->image_filler.clip = clip;
         d->image_filler.initTexture(&img, s->intOpacity, QTextureData::Plain, toAlignedRect_positive(sr));
-        if (!d->image_filler.blend)
+        if (!d->image_filler.blend){
+#ifdef QT_DEBUG_DRAW
+    qDebug() << "QRasterPaintEngine::drawImage()-3,!d->image_filler.blend" << endl;
+#endif
             return;
+	}
         d->image_filler.dx = -(r.x() + s->matrix.dx()) + sr.x();
         d->image_filler.dy = -(r.y() + s->matrix.dy()) + sr.y();
 
@@ -3085,9 +3183,12 @@ void QRasterPaintEngine::drawTextItem(const QPointF &p, const QTextItem &textIte
 
 #ifdef QT_DEBUG_DRAW
     Q_D(QRasterPaintEngine);
-    fprintf(stderr," - QRasterPaintEngine::drawTextItem(), (%.2f,%.2f), string=%s ct=%d\n",
+    qDebug(" - QRasterPaintEngine::drawTextItem(), (%.2f,%.2f), string=%s ct=%d",
            p.x(), p.y(), QString::fromRawData(ti.chars, ti.num_chars).toLatin1().data(),
            d->glyphCacheType);
+//    fprintf(stderr," - QRasterPaintEngine::drawTextItem(), (%.2f,%.2f), string=%s ct=%d\n",
+//           p.x(), p.y(), QString::fromRawData(ti.chars, ti.num_chars).toLatin1().data(),
+//           d->glyphCacheType);
 #endif
 
     ensurePen();
@@ -5173,6 +5274,7 @@ static void drawEllipse_midpoint_i(const QRect &rect, const QRect &clip,
 #ifdef QT_DEBUG_DRAW
 void dumpClip(int width, int height, const QClipData *clip)
 {
+/*
     QImage clipImg(width, height, QImage::Format_ARGB32_Premultiplied);
     clipImg.fill(0xffff0000);
 
@@ -5200,9 +5302,10 @@ void dumpClip(int width, int height, const QClipData *clip)
     Q_ASSERT(x0 >= 0);
     Q_ASSERT(y1 >= 0);
     Q_ASSERT(x1 >= 0);
-
-    fprintf(stderr,"clip %d: %d %d - %d %d\n", counter, x0, y0, x1, y1);
+    qDebug("clip %d: %d %d - %d %d", counter, x0, y0, x1, y1);
+//    fprintf(stderr,"clip %d: %d %d - %d %d\n", counter, x0, y0, x1, y1);
     clipImg.save(QString::fromLatin1("clip-%0.png").arg(counter++));
+*/
 }
 #endif
 

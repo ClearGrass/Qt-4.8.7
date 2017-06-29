@@ -49,9 +49,7 @@
 #include <private/qstatictext_p.h>
 #include <private/qrawfont_p.h>
 
-#include <QDebug>
-
-// #define QPAINTBUFFER_DEBUG_DRAW
+#include <qdebug.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -249,23 +247,20 @@ void QPaintBuffer::draw(QPainter *painter, int frame) const
     qDebug() << "QPaintBuffer::draw() --------------------------------";
 
     Q_D(const QPaintBuffer);
-    printf("Float buffer:");
+    qDebug("Float buffer:");
     for (int i=0; i<d->floats.size(); i++) {
         if ((i % 10) == 0) {
-            printf("\n%4d-%4d: ", i, i+9);
+            qDebug("%4d-%4d: ", i, i+9);
         }
-        printf("%4.2f  ", d->floats[i]);
+        qDebug("%4.2f  ", d->floats[i]);
     }
-    printf("\n");
-
-    printf("Int Buffer:");
+    qDebug("Int Buffer:");
     for (int i=0; i<d->ints.size(); i++) {
         if ((i % 10) == 0) {
-            printf("\n%4d-%4d: ", i, i+10);
+            qDebug("%4d-%4d: ", i, i+10);
         }
-        printf("%5d", d->ints[i]);
+        qDebug("%5d", d->ints[i]);
     }
-    printf("\n");
 #endif
 
     processCommands(painter, frameStartIndex(frame), frameEndIndex(frame));

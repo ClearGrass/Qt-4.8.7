@@ -60,8 +60,6 @@ QT_BEGIN_NAMESPACE
 
 extern QPainterPath qt_regionToPath(const QRegion &region);
 
-// #define QT_DEBUG_DRAW
-
 static void draw_text_item_win(const QPointF &_pos, const QTextItemInt &ti, HDC hdc,
                                bool convertToText, const QTransform &xform, const QPointF &topLeft);
 

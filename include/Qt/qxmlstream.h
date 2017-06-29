@@ -6,5 +6,5 @@
     #endif
 #endif
 
-#include "../QtCore/qxmlstream.h"
 #include "../QtXml/qxmlstream.h"
+#include "../QtCore/qxmlstream.h"

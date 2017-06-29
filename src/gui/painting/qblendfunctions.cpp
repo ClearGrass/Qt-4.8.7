@@ -38,9 +38,9 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-
 #include <qmath.h>
 #include "qblendfunctions_p.h"
+#include <qdebug.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -186,7 +186,7 @@ void qt_scale_image_rgb16_on_rgb16(uchar *destPixels, int dbpl,
                                    int const_alpha)
 {
 #ifdef QT_DEBUG_DRAW
-    printf("qt_scale_rgb16_on_rgb16: dst=(%p, %d), src=(%p, %d), target=(%d, %d), [%d x %d], src=(%d, %d) [%d x %d] alpha=%d\n",
+    qDebug("qt_scale_image_rgb16_on_rgb16: dst=(%p, %d), src=(%p, %d), target=(%d, %d), [%d x %d], src=(%d, %d) [%d x %d] alpha=%d",
            destPixels, dbpl, srcPixels, sbpl,
            targetRect.x(), targetRect.y(), targetRect.width(), targetRect.height(),
            sourceRect.x(), sourceRect.y(), sourceRect.width(), sourceRect.height(),
@@ -211,7 +211,7 @@ void qt_scale_image_argb24_on_rgb16(uchar *destPixels, int dbpl,
                                    int const_alpha)
 {
 #ifdef QT_DEBUG_DRAW
-    printf("qt_scale_argb24_on_rgb16: dst=(%p, %d), src=(%p, %d), target=(%d, %d), [%d x %d], src=(%d, %d) [%d x %d] alpha=%d\n",
+    qDebug("qt_scale_image_argb24_on_rgb16: dst=(%p, %d), src=(%p, %d), target=(%d, %d), [%d x %d], src=(%d, %d) [%d x %d] alpha=%d",
            destPixels, dbpl, srcPixels, sbpl,
            targetRect.x(), targetRect.y(), targetRect.width(), targetRect.height(),
            sourceRect.x(), sourceRect.y(), sourceRect.width(), sourceRect.height(),
@@ -237,7 +237,7 @@ void qt_scale_image_argb32_on_rgb16(uchar *destPixels, int dbpl,
                                     int const_alpha)
 {
 #ifdef QT_DEBUG_DRAW
-    printf("qt_scale_argb32_on_rgb16: dst=(%p, %d), src=(%p, %d), target=(%d, %d), [%d x %d], src=(%d, %d) [%d x %d] alpha=%d\n",
+    qDebug("qt_scale_image_argb32_on_rgb16: dst=(%p, %d), src=(%p, %d), target=(%d, %d), [%d x %d], src=(%d, %d) [%d x %d] alpha=%d",
            destPixels, dbpl, srcPixels, sbpl,
            targetRect.x(), targetRect.y(), targetRect.width(), targetRect.height(),
            sourceRect.x(), sourceRect.y(), sourceRect.width(), sourceRect.height(),
@@ -260,7 +260,7 @@ void qt_blend_rgb16_on_rgb16(uchar *dst, int dbpl,
                              int const_alpha)
 {
 #ifdef QT_DEBUG_DRAW
-    printf("qt_blend_rgb16_on_rgb16: dst=(%p, %d), src=(%p, %d), dim=(%d, %d) alpha=%d\n",
+    qDebug("qt_blend_rgb16_on_rgb16: dst=(%p, %d), src=(%p, %d), dim=(%d, %d) alpha=%d",
            dst, dbpl, src, sbpl, w, h, const_alpha);
 #endif
 
@@ -300,6 +300,10 @@ template <typename T> void qt_blend_argb24_on_rgb16(uchar *destPixels, int dbpl,
                                                     const uchar *srcPixels, int sbpl,
                                                     int w, int h, const T &alphaFunc)
 {
+#ifdef QT_DEBUG_DRAW
+    qDebug("qt_blend_argb24_on_rgb16-1: dst=(%p, %d), src=(%p, %d), dim=(%d, %d)",
+           destPixels, dbpl, srcPixels, sbpl, w, h);
+#endif
     int srcOffset = w*3;
     int dstJPL = dbpl / 2;
     quint16 *dst = (quint16 *) destPixels;
@@ -353,7 +357,7 @@ static void qt_blend_argb24_on_rgb16(uchar *destPixels, int dbpl,
                                      int const_alpha)
 {
 #ifdef QT_DEBUG_DRAW
-    printf("qt_blend_argb24_on_rgb16: dst=(%p, %d), src=(%p, %d), dim=(%d, %d) alpha=%d\n",
+    qDebug("qt_blend_argb24_on_rgb16: dst=(%p, %d), src=(%p, %d), dim=(%d, %d) alpha=%d",
            destPixels, dbpl, srcPixels, sbpl, w, h, const_alpha);
 #endif
 
@@ -374,6 +378,11 @@ void qt_blend_argb32_on_rgb16_const_alpha(uchar *destPixels, int dbpl,
                                           int w, int h,
                                           int const_alpha)
 {
+#ifdef QT_DEBUG_DRAW
+    qDebug("qt_blend_argb32_on_rgb16_const_alpha: dst=(%p, %d), src=(%p, %d), dim=(%d, %d) alpha=%d",
+           destPixels, dbpl, srcPixels, sbpl, w, h, const_alpha);
+#endif
+
     quint16 *dst = (quint16 *) destPixels;
     const quint32 *src = (const quint32 *) srcPixels;
 
@@ -397,6 +406,11 @@ static void qt_blend_argb32_on_rgb16(uchar *destPixels, int dbpl,
                                      int w, int h,
                                      int const_alpha)
 {
+#ifdef QT_DEBUG_DRAW
+    qDebug("qt_blend_argb32_on_rgb16: dst=(%p, %d), src=(%p, %d), dim=(%d, %d) alpha=%d",
+           destPixels, dbpl, srcPixels, sbpl, w, h, const_alpha);
+#endif
+
     if (const_alpha != 256) {
         qt_blend_argb32_on_rgb16_const_alpha(destPixels, dbpl, srcPixels, sbpl, w, h, const_alpha);
         return;
@@ -451,7 +465,7 @@ static void qt_blend_rgb32_on_rgb16(uchar *destPixels, int dbpl,
                                     int const_alpha)
 {
 #ifdef QT_DEBUG_DRAW
-    printf("qt_blend_rgb32_on_rgb16: dst=(%p, %d), src=(%p, %d), dim=(%d, %d) alpha=%d\n",
+    qDebug("qt_blend_rgb32_on_rgb16: dst=(%p, %d), src=(%p, %d), dim=(%d, %d) alpha=%d",
            destPixels, dbpl, srcPixels, sbpl, w, h, const_alpha);
 #endif
 
@@ -494,9 +508,11 @@ static void qt_blend_argb32_on_argb32(uchar *destPixels, int dbpl,
                                       int const_alpha)
 {
 #ifdef QT_DEBUG_DRAW
-    fprintf(stdout, "qt_blend_argb32_on_argb32: dst=(%p, %d), src=(%p, %d), dim=(%d, %d) alpha=%d\n",
+    qDebug("qt_blend_argb32_on_argb32: dst=(%p, %d), src=(%p, %d), dim=(%d, %d) alpha=%d",
             destPixels, dbpl, srcPixels, sbpl, w, h, const_alpha);
-    fflush(stdout);
+//    fprintf(stdout, "qt_blend_argb32_on_argb32: dst=(%p, %d), src=(%p, %d), dim=(%d, %d) alpha=%d\n",
+//            destPixels, dbpl, srcPixels, sbpl, w, h, const_alpha);
+//    fflush(stdout);
 #endif
 
     const uint *src = (const uint *) srcPixels;
@@ -533,9 +549,11 @@ void qt_blend_rgb32_on_rgb32(uchar *destPixels, int dbpl,
                              int const_alpha)
 {
 #ifdef QT_DEBUG_DRAW
-    fprintf(stdout, "qt_blend_rgb32_on_rgb32: dst=(%p, %d), src=(%p, %d), dim=(%d, %d) alpha=%d\n",
+    qDebug("qt_blend_rgb32_on_rgb32: dst=(%p, %d), src=(%p, %d), dim=(%d, %d) alpha=%d",
             destPixels, dbpl, srcPixels, sbpl, w, h, const_alpha);
-    fflush(stdout);
+//    fprintf(stdout, "qt_blend_rgb32_on_rgb32: dst=(%p, %d), src=(%p, %d), dim=(%d, %d) alpha=%d\n",
+//            destPixels, dbpl, srcPixels, sbpl, w, h, const_alpha);
+//    fflush(stdout);
 #endif
 
     if (const_alpha != 256) {
@@ -618,7 +636,7 @@ void qt_scale_image_rgb32_on_rgb32(uchar *destPixels, int dbpl,
                                    int const_alpha)
 {
 #ifdef QT_DEBUG_DRAW
-    printf("qt_scale_rgb32_on_rgb32: dst=(%p, %d), src=(%p, %d), target=(%d, %d), [%d x %d], src=(%d, %d) [%d x %d] alpha=%d\n",
+    qDebug("qt_scale_image_rgb32_on_rgb32: dst=(%p, %d), src=(%p, %d), target=(%d, %d), [%d x %d], src=(%d, %d) [%d x %d] alpha=%d",
            destPixels, dbpl, srcPixels, sbpl,
            targetRect.x(), targetRect.y(), targetRect.width(), targetRect.height(),
            sourceRect.x(), sourceRect.y(), sourceRect.width(), sourceRect.height(),
@@ -643,7 +661,7 @@ void qt_scale_image_argb32_on_argb32(uchar *destPixels, int dbpl,
                                      int const_alpha)
 {
 #ifdef QT_DEBUG_DRAW
-    printf("qt_scale_argb32_on_argb32: dst=(%p, %d), src=(%p, %d), target=(%d, %d), [%d x %d], src=(%d, %d) [%d x %d] alpha=%d\n",
+    qDebug("qt_scale_image_argb32_on_argb32: dst=(%p, %d), src=(%p, %d), target=(%d, %d), [%d x %d], src=(%d, %d) [%d x %d] alpha=%d",
            destPixels, dbpl, srcPixels, sbpl,
            targetRect.x(), targetRect.y(), targetRect.width(), targetRect.height(),
            sourceRect.x(), sourceRect.y(), sourceRect.width(), sourceRect.height(),
@@ -668,6 +686,13 @@ void qt_transform_image_rgb16_on_rgb16(uchar *destPixels, int dbpl,
                                        const QTransform &targetRectTransform,
                                        int const_alpha)
 {
+#ifdef QT_DEBUG_DRAW
+    qDebug("qt_transform_image_rgb16_on_rgb16: dst=(%p, %d), src=(%p, %d), target=(%d, %d), [%d x %d], src=(%d, %d) [%d x %d] alpha=%d",
+           destPixels, dbpl, srcPixels, sbpl,
+           targetRect.x(), targetRect.y(), targetRect.width(), targetRect.height(),
+           sourceRect.x(), sourceRect.y(), sourceRect.width(), sourceRect.height(),
+           const_alpha);
+#endif
     if (const_alpha == 256) {
         Blend_RGB16_on_RGB16_NoAlpha noAlpha;
         qt_transform_image(reinterpret_cast<quint16 *>(destPixels), dbpl,
@@ -689,6 +714,13 @@ void qt_transform_image_argb24_on_rgb16(uchar *destPixels, int dbpl,
                                         const QTransform &targetRectTransform,
                                         int const_alpha)
 {
+#ifdef QT_DEBUG_DRAW
+    qDebug("qt_transform_image_argb24_on_rgb16: dst=(%p, %d), src=(%p, %d), target=(%d, %d), [%d x %d], src=(%d, %d) [%d x %d] alpha=%d",
+           destPixels, dbpl, srcPixels, sbpl,
+           targetRect.x(), targetRect.y(), targetRect.width(), targetRect.height(),
+           sourceRect.x(), sourceRect.y(), sourceRect.width(), sourceRect.height(),
+           const_alpha);
+#endif
     if (const_alpha == 256) {
         Blend_ARGB24_on_RGB16_SourceAlpha noAlpha;
         qt_transform_image(reinterpret_cast<quint16 *>(destPixels), dbpl,
@@ -711,6 +743,13 @@ void qt_transform_image_argb32_on_rgb16(uchar *destPixels, int dbpl,
                                         const QTransform &targetRectTransform,
                                         int const_alpha)
 {
+#ifdef QT_DEBUG_DRAW
+    qDebug("qt_transform_image_argb32_on_rgb16: dst=(%p, %d), src=(%p, %d), target=(%d, %d), [%d x %d], src=(%d, %d) [%d x %d] alpha=%d",
+           destPixels, dbpl, srcPixels, sbpl,
+           targetRect.x(), targetRect.y(), targetRect.width(), targetRect.height(),
+           sourceRect.x(), sourceRect.y(), sourceRect.width(), sourceRect.height(),
+           const_alpha);
+#endif
     if (const_alpha == 256) {
         Blend_ARGB32_on_RGB16_SourceAlpha noAlpha;
         qt_transform_image(reinterpret_cast<quint16 *>(destPixels), dbpl,
@@ -733,6 +772,13 @@ void qt_transform_image_rgb32_on_rgb32(uchar *destPixels, int dbpl,
                                        const QTransform &targetRectTransform,
                                        int const_alpha)
 {
+#ifdef QT_DEBUG_DRAW
+    qDebug("qt_transform_image_rgb32_on_rgb32: dst=(%p, %d), src=(%p, %d), target=(%d, %d), [%d x %d], src=(%d, %d) [%d x %d] alpha=%d",
+           destPixels, dbpl, srcPixels, sbpl,
+           targetRect.x(), targetRect.y(), targetRect.width(), targetRect.height(),
+           sourceRect.x(), sourceRect.y(), sourceRect.width(), sourceRect.height(),
+           const_alpha);
+#endif
     if (const_alpha == 256) {
         Blend_RGB32_on_RGB32_NoAlpha noAlpha;
         qt_transform_image(reinterpret_cast<quint32 *>(destPixels), dbpl,
@@ -754,6 +800,13 @@ void qt_transform_image_argb32_on_argb32(uchar *destPixels, int dbpl,
                                          const QTransform &targetRectTransform,
                                          int const_alpha)
 {
+#ifdef QT_DEBUG_DRAW
+    qDebug("qt_transform_image_argb32_on_argb32: dst=(%p, %d), src=(%p, %d), target=(%d, %d), [%d x %d], src=(%d, %d) [%d x %d] alpha=%d",
+           destPixels, dbpl, srcPixels, sbpl,
+           targetRect.x(), targetRect.y(), targetRect.width(), targetRect.height(),
+           sourceRect.x(), sourceRect.y(), sourceRect.width(), sourceRect.height(),
+           const_alpha);
+#endif
     if (const_alpha == 256) {
         Blend_ARGB32_on_ARGB32_SourceAlpha sourceAlpha;
         qt_transform_image(reinterpret_cast<quint32 *>(destPixels), dbpl,

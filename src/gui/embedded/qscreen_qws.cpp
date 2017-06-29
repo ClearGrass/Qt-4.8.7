@@ -2409,6 +2409,9 @@ static void blendCursor(QImage *dest, const QImage &cursor, const QPoint &offset
 */
 void QScreen::exposeRegion(QRegion r, int windowIndex)
 {
+#ifdef QT_DEBUG_DRAW
+    qDebug("--- exposeRegion start ---");
+#endif
     r &= region();
     if (r.isEmpty())
         return;
@@ -2417,19 +2420,31 @@ void QScreen::exposeRegion(QRegion r, int windowIndex)
     // when we have just lowered a window, we have to expose all the windows below where the
     // window used to be.
     if (changing && qwsServer->clientWindows().at(changing)->state() == QWSWindow::Lowering)
-        changing = 0;
+    {
+#ifdef QT_DEBUG_DRAW
+    qDebug("exposeRegion---changing && qwsServer->clientWindows().at(changing)->state() == QWSWindow::Lowering");
+#endif
+	changing = 0;
+    }
+        
 #ifdef QTOPIA_PERFTEST
     static enum { PerfTestUnknown, PerfTestOn, PerfTestOff } perfTestState = PerfTestUnknown;
     if(PerfTestUnknown == perfTestState) {
+#ifdef QT_DEBUG_DRAW
+    qDebug("exposeRegion---PerfTestUnknown == perfTestState");
+#endif
         if(::getenv("QTOPIA_PERFTEST"))
             perfTestState = PerfTestOn;
         else
             perfTestState = PerfTestOff;
     }
     if(PerfTestOn == perfTestState) {
+#ifdef QT_DEBUG_DRAW
+    qDebug("exposeRegion---PerfTestOn == perfTestState");
+#endif
         QWSWindow *changed = qwsServer->clientWindows().at(changing);
         if(!changed->client()->identity().isEmpty())
-            qDebug() << "Performance  :  expose_region  :"
+            qDebug() << "exposeRegion---Performance  :  expose_region  :"
                      << changed->client()->identity()
                      << r.boundingRect() << ": "
                      << qPrintable( QTime::currentTime().toString( "h:mm:ss.zzz" ) );
@@ -2442,33 +2457,54 @@ void QScreen::exposeRegion(QRegion r, int windowIndex)
 
 #ifndef QT_NO_QWS_CURSOR
     if (qt_screencursor && !qt_screencursor->isAccelerated()) {
+#ifdef QT_DEBUG_DRAW
+    qDebug("exposeRegion---qt_screencursor && !qt_screencursor->isAccelerated()");
+#endif
         blendRegion = r & qt_screencursor->boundingRect();
     }
 #endif
     compose(0, r, blendRegion, &blendBuffer, changing);
 
     if (blendBuffer && !blendBuffer->isNull()) {
+#ifdef QT_DEBUG_DRAW
+    qDebug("exposeRegion---blendBuffer && !blendBuffer->isNull()");
+#endif
         const QPoint offset = blendRegion.boundingRect().topLeft();
 #ifndef QT_NO_QWS_CURSOR
         if (qt_screencursor && !qt_screencursor->isAccelerated()) {
+#ifdef QT_DEBUG_DRAW
+    qDebug("exposeRegion---qt_screencursor && !qt_screencursor->isAccelerated()");
+#endif
             const QRect cursorRect = qt_screencursor->boundingRect();
             if (blendRegion.intersects(cursorRect)) {
+#ifdef QT_DEBUG_DRAW
+    qDebug("exposeRegion---blendRegion.intersects(cursorRect)");
+#endif
                 blendCursor(blendBuffer, qt_screencursor->image(),
                             cursorRect.topLeft() - offset);
             }
         }
 #endif // QT_NO_QWS_CURSOR
         blit(*blendBuffer, offset, blendRegion);
-        delete blendBuffer;
+//        delete blendBuffer;
     }
 
     if (r.rectCount() == 1) {
+#ifdef QT_DEBUG_DRAW
+    qDebug("exposeRegion---r.rectCount() == 1");
+#endif
         setDirty(r.boundingRect());
     } else {
+#ifdef QT_DEBUG_DRAW
+    qDebug("exposeRegion---r.rectCount() != 1");
+#endif
         const QVector<QRect> rects = r.rects();
         for (int i = 0; i < rects.size(); ++i)
             setDirty(rects.at(i));
     }
+#ifdef QT_DEBUG_DRAW
+    qDebug("--- exposeRegion end ---");
+#endif
 }
 
 /*!
@@ -2674,6 +2710,9 @@ QWSWindowSurface* QScreen::createSurface(QWidget *widget) const
 void QScreen::compose(int level, const QRegion &exposed, QRegion &blend,
                       QImage **blendbuffer, int changing_level)
 {
+#ifdef QT_DEBUG_DRAW
+    qDebug("--- compose start ---");
+#endif
     QRect exposed_bounds = exposed.boundingRect();
     QWSWindow *win = 0;
     do {
@@ -2688,20 +2727,42 @@ void QScreen::compose(int level, const QRegion &exposed, QRegion &blend,
     bool opaque = true;
 
     if (win) {
+#ifdef QT_DEBUG_DRAW
+    qDebug("compose---win != NULL");
+#endif
         opaque = win->isOpaque() || !surface->isBuffered();
         if (opaque) {
+#ifdef QT_DEBUG_DRAW
+    qDebug("compose---opaque != NULL");
+#endif
             exposedBelow -= win->paintedRegion();
-            if (above_changing || !surface->isBuffered())
-                blend -= exposed & win->paintedRegion();
+            if (above_changing || !surface->isBuffered()){
+#ifdef QT_DEBUG_DRAW
+    qDebug("compose---above_changing || !surface->isBuffered(),blend -= exposed & win->paintedRegion();");
+#endif
+	        blend -= exposed & win->paintedRegion();
+	    }
         } else {
+#ifdef QT_DEBUG_DRAW
+    qDebug("compose---opaque == NULL,blend += exposed & win->paintedRegion();");
+#endif
             blend += exposed & win->paintedRegion();
         }
     }
     if (win && !exposedBelow.isEmpty()) {
+#ifdef QT_DEBUG_DRAW
+    qDebug("compose---win && !exposedBelow.isEmpty(),compose(level, exposedBelow, blend, blendbuffer, changing_level);");
+#endif
         compose(level, exposedBelow, blend, blendbuffer, changing_level);
     } else {
+#ifdef QT_DEBUG_DRAW
+    qDebug("compose---!win || exposedBelow.isEmpty()");
+#endif
         QSize blendSize = blend.boundingRect().size();
         if (!blendSize.isNull()) {
+#ifdef QT_DEBUG_DRAW
+    qDebug("compose---!blendSize.isNull(),*blendbuffer = new QImage(blendSize, d_ptr->preferredImageFormat());");
+#endif
             *blendbuffer = new QImage(blendSize, d_ptr->preferredImageFormat());
         }
     }
@@ -2714,10 +2775,16 @@ void QScreen::compose(int level, const QRegion &exposed, QRegion &blend,
 
     QRegion blendRegion = exposed & blend;
 
-    if (win)
+    if (win){
+#ifdef QT_DEBUG_DRAW
+    qDebug("compose---win != NULL,blendRegion &= win->paintedRegion();");
+#endif
         blendRegion &= win->paintedRegion();
+    }
     if (!blendRegion.isEmpty()) {
-
+#ifdef QT_DEBUG_DRAW
+    qDebug("compose---!blendRegion.isEmpty()");
+#endif
         QPoint off = blend.boundingRect().topLeft();
 
         QRasterBuffer rb;
@@ -2725,6 +2792,9 @@ void QScreen::compose(int level, const QRegion &exposed, QRegion &blend,
         QSpanData spanData;
         spanData.init(&rb, 0);
         if (!win) {
+#ifdef QT_DEBUG_DRAW
+    qDebug("compose---win == NULL");
+#endif
             const QImage::Format format = (*blendbuffer)->format();
             switch (format) {
             case QImage::Format_ARGB32_Premultiplied:
@@ -2742,9 +2812,22 @@ void QScreen::compose(int level, const QRegion &exposed, QRegion &blend,
             spanData.dx = off.x();
             spanData.dy = off.y();
         } else if (!surface->isBuffered()) {
+#ifdef QT_DEBUG_DRAW
+    qDebug("compose---!surface->isBuffered(),return");
+    qDebug("--- compose end ---");
+#endif
                 return;
         } else {
+#ifdef QT_DEBUG_DRAW
+    qDebug("compose---!win---else---*blendbuffer = &img; return");
+#endif
+	    delete *blendbuffer;
             const QImage &img = surface->image();
+            *blendbuffer = (QImage *)&img;
+#ifdef QT_DEBUG_DRAW
+    qDebug("--- compose end ---");
+#endif
+            return;
             QPoint winoff = off - win->requestedRegion().boundingRect().topLeft();
             // convert win->opacity() from scale [0..255] to [0..256]
             int const_alpha = win->opacity();
@@ -2754,11 +2837,19 @@ void QScreen::compose(int level, const QRegion &exposed, QRegion &blend,
             spanData.dx = winoff.x();
             spanData.dy = winoff.y();
         }
-        if (!spanData.blend)
+        if (!spanData.blend){
+#ifdef QT_DEBUG_DRAW
+    qDebug("compose---!spanData.blend,return");
+    qDebug("--- compose end ---");
+#endif
             return;
-
-        if (surface)
+	}
+        if (surface){
+#ifdef QT_DEBUG_DRAW
+    qDebug("compose---surface != NULL,surface->lock()");
+#endif
             surface->lock();
+	}
         const QVector<QRect> rects = blendRegion.rects();
         const int nspans = 256;
         QT_FT_Span spans[nspans];
@@ -2781,9 +2872,16 @@ void QScreen::compose(int level, const QRegion &exposed, QRegion &blend,
                 y += n;
             }
         }
-        if (surface)
+        if (surface){
+#ifdef QT_DEBUG_DRAW
+    qDebug("compose---surface != NULL,surface->unlock()");
+#endif
             surface->unlock();
+	}
     }
+#ifdef QT_DEBUG_DRAW
+    qDebug("--- compose end ---");
+#endif
 }
 
 void QScreen::paintBackground(const QRegion &r)

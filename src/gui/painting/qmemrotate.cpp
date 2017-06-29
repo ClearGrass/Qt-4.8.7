@@ -40,6 +40,7 @@
 ****************************************************************************/
 
 #include "private/qmemrotate_p.h"
+#include <qdebug.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -300,6 +301,8 @@ Q_STATIC_TEMPLATE_FUNCTION inline void qt_memrotate270_tiled(const SRC *src, int
                                          int sstride,
                                          DST *dest, int dstride)
 {
+    qDebug("---qt_memrotate270_tiled begin---");
+
     sstride /= sizeof(SRC);
     dstride /= sizeof(DST);
 
@@ -353,6 +356,7 @@ Q_STATIC_TEMPLATE_FUNCTION inline void qt_memrotate270_tiled(const SRC *src, int
             }
         }
     }
+    qDebug("---qt_memrotate270_tiled end---");
 }
 
 template <class DST, class SRC>
@@ -360,6 +364,7 @@ Q_STATIC_TEMPLATE_FUNCTION inline void qt_memrotate270_tiled_unpacked(const SRC 
                                                   int sstride,
                                                   DST *dest, int dstride)
 {
+    qDebug("---qt_memrotate270_tiled_unpacked begin---");
     const int numTilesX = (w + tileSize - 1) / tileSize;
     const int numTilesY = (h + tileSize - 1) / tileSize;
 
@@ -381,6 +386,7 @@ Q_STATIC_TEMPLATE_FUNCTION inline void qt_memrotate270_tiled_unpacked(const SRC 
             }
         }
     }
+    qDebug("---qt_memrotate270_tiled_unpacked end---");
 }
 
 #endif // QT_ROTATION_ALGORITHM
