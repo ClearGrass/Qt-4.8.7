@@ -2793,8 +2793,9 @@ void QScreen::compose(int level, const QRegion &exposed, QRegion &blend,
         spanData.init(&rb, 0);
         if (!win) {
 #ifdef QT_DEBUG_DRAW
-    qDebug("compose---win == NULL");
+    qDebug("compose---win == NULL,return");
 #endif
+	    return;
             const QImage::Format format = (*blendbuffer)->format();
             switch (format) {
             case QImage::Format_ARGB32_Premultiplied:

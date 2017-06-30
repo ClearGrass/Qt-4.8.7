@@ -301,8 +301,9 @@ Q_STATIC_TEMPLATE_FUNCTION inline void qt_memrotate270_tiled(const SRC *src, int
                                          int sstride,
                                          DST *dest, int dstride)
 {
+#ifdef QT_DEBUG_DRAW
     qDebug("---qt_memrotate270_tiled begin---");
-
+#endif
     sstride /= sizeof(SRC);
     dstride /= sizeof(DST);
 
@@ -356,7 +357,9 @@ Q_STATIC_TEMPLATE_FUNCTION inline void qt_memrotate270_tiled(const SRC *src, int
             }
         }
     }
+#ifdef QT_DEBUG_DRAW
     qDebug("---qt_memrotate270_tiled end---");
+#endif
 }
 
 template <class DST, class SRC>
@@ -364,7 +367,9 @@ Q_STATIC_TEMPLATE_FUNCTION inline void qt_memrotate270_tiled_unpacked(const SRC 
                                                   int sstride,
                                                   DST *dest, int dstride)
 {
+#ifdef QT_DEBUG_DRAW
     qDebug("---qt_memrotate270_tiled_unpacked begin---");
+#endif
     const int numTilesX = (w + tileSize - 1) / tileSize;
     const int numTilesY = (h + tileSize - 1) / tileSize;
 
@@ -386,7 +391,9 @@ Q_STATIC_TEMPLATE_FUNCTION inline void qt_memrotate270_tiled_unpacked(const SRC 
             }
         }
     }
+#ifdef QT_DEBUG_DRAW
     qDebug("---qt_memrotate270_tiled_unpacked end---");
+#endif
 }
 
 #endif // QT_ROTATION_ALGORITHM

@@ -2,6 +2,6 @@
 #define QT_QTXML_MODULE_H
 #include <QtCore/QtCore>
 #include "qxml.h"
-#include "qxmlstream.h"
 #include "qdom.h"
+#include "qxmlstream.h"
 #endif

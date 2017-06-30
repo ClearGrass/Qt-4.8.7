@@ -330,17 +330,23 @@ static inline void blit180(QScreen *screen, const QImage &image,
 template <class DST, class SRC>
 static inline void blit270(QScreen *screen, const QImage &image,
                            const QRect &rect, const QPoint &topLeft)
-{
-    qDebug("---blit270 begin---topLeft.y() >> rect.top(),topLeft.x() >>rect.left() ");    
+{ 
+#ifdef QT_DEBUG_DRAW
+    qDebug("---blit270 begin---");
+    qDebug("rect=(%d, %d), [%d x %d],topLeft=(%d, %d)",rect.x(),rect.y(),rect.width(),rect.height(),topLeft.x(),topLeft.y());
+#endif
     const SRC *src = (const SRC *)(image.scanLine(rect.top())) + rect.left();
-//    DST *dest = (DST*)(screen->base() + topLeft.y() * screen->linestep())
-//                + topLeft.x();
-    DST *dest = (DST*)(screen->base() + rect.top() * screen->linestep())
-                + rect.left();
+    DST *dest = (DST*)(screen->base() + topLeft.y() * screen->linestep())
+                + topLeft.x();
+//    DST *dest = (DST*)(screen->base() + rect.top() * screen->linestep())
+//                + rect.left();
     qt_memrotate270(src, rect.width(), rect.height(), image.bytesPerLine(),
                     dest, screen->linestep());
+    
+#ifdef QT_DEBUG_DRAW
     qDebug("Image --- %p",&image);
     qDebug("---blit270 end---");
+#endif
 }
 
 typedef void (*BlitFunc)(QScreen *, const QImage &, const QRect &, const QPoint &);
@@ -368,12 +374,16 @@ do {                                            \
 void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
                               const QRegion &region)
 {
+#ifdef QT_DEBUG_DRAW
     qDebug("---blit begin---");
     qDebug("Image --- %p",&image);
+#endif
     const Transformation trans = d_ptr->transformation;
     if (trans == None) {
         QProxyScreen::blit(image, topLeft, region);
+#ifdef QT_DEBUG_DRAW
 	qDebug("---blit end---");
+#endif
         return;
     }
 
@@ -440,12 +450,16 @@ void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
         break;
 #endif
     default:
+#ifdef QT_DEBUG_DRAW
 	qDebug("---blit end---");
+#endif
         return;
     }
     if (!func)
     {
+#ifdef QT_DEBUG_DRAW
 	qDebug("---blit end---");
+#endif
         return;
     }
     QWSDisplay::grab();
@@ -466,11 +480,16 @@ void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
         default:
             break;
         }
-        func(this, image, r.translated(-topLeft), dst);
+#ifdef QT_DEBUG_DRAW
+    qDebug("blit---func(this, image, r, dst)");
+#endif
+//      func(this, image, r.translated(-topLeft), dst);
+	func(this, image, r, dst);
     }
     QWSDisplay::ungrab();
+#ifdef QT_DEBUG_DRAW
     qDebug("---blit end---");
-
+#endif
 }
 
 /*!
