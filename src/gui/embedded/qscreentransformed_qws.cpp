@@ -357,12 +357,12 @@ static inline void blit270(QScreen *screen, const QImage &image,
 //    DST *dest = (DST*)(screen->base() + rect.top() * screen->linestep())
 //                + rect.left();
     if(g_LinuxFb != 0 && g_CurrentScreen == 1) {
-        dest += 848 * 480;
+        dest += 864 * 480;
     }
     qt_memrotate270(src, rect.width(), rect.height(), image.bytesPerLine(),
                     dest, screen->linestep());
     if(g_LinuxFb != 0) {
-        g_VarSI.yoffset = g_CurrentScreen * 848;
+        g_VarSI.yoffset = g_CurrentScreen * 864;
         setVarScreenInfo(g_LinuxFb, &g_VarSI);
         g_CurrentScreen = g_CurrentScreen == 0 ? 1 : 0;
     }
