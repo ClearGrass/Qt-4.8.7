@@ -1095,6 +1095,7 @@ void QDeclarativePathView::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_D(QDeclarativePathView);
     if (d->interactive) {
+		mousePressPos = event->pos();    					//Jason add \BC\C7¼\B0\B4\CF\C2λ\D6\C3
         d->handleMousePressEvent(event);
         event->accept();
     } else {
@@ -1192,6 +1193,34 @@ void QDeclarativePathView::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_D(QDeclarativePathView);
     if (d->interactive) {
+		////////////////////////////////////////Jason add
+		QPointF mouseReleasePos = event->pos();
+		int iTmp = (int)offset();
+		float fTmp = offset() - iTmp;
+//		qDebug() << "QDeclarativePathView::mouseReleaseEvent, offset = " << offset() << endl;
+//		qDebug() << "QDeclarativePathView::mouseReleaseEvent,(int)offset = " << iTmp << endl;
+		
+//		qDebug() << "QDeclarativePathView::mouseReleaseEvent,offset - iTmp = " << fTmp << endl;
+//        qDebug() << "QDeclarativePathView::mouseReleaseEvent, mouseReleasePos= " << mouseReleasePos << endl;
+		
+//        qDebug() << "QDeclarativePathView::mouseReleaseEvent, mousePressPos= " << mousePressPos << endl;
+		if(mouseReleasePos.x() > mousePressPos.x()){
+		if(fTmp < 0.5 && fTmp > 0.3)
+			{
+				    //qDebug() << "QDeclarativePathView::mouseReleaseEvent, less " << endl;
+					d->setOffset(iTmp + 0.51);
+			}
+		}
+		else if (mouseReleasePos.x() < mousePressPos.x())
+		{
+		  if(fTmp > 0.5  && fTmp < 0.7)
+		  	{
+		  	    //qDebug() << "QDeclarativePathView::mouseReleaseEvent, more " << endl;
+		  		d->setOffset(iTmp + 0.49);
+		  	}
+		}
+		
+		/////////////////////////////////////////////////
         d->handleMouseReleaseEvent(event);
         event->accept();
         ungrabMouse();
@@ -1243,6 +1272,7 @@ void QDeclarativePathViewPrivate::handleMouseReleaseEvent(QGraphicsSceneMouseEve
             emit q->flickStarted();
         }
     } else {
+
         fixOffset();
     }
 

@@ -89,6 +89,53 @@ Q_STATIC_TEMPLATE_FUNCTION inline void qt_memrotate270_cachedRead(const SRC *src
     }
 }
 
+template <>
+Q_STATIC_TEMPLATE_SPECIALIZATION
+inline void qt_memrotate270_cachedRead<quint32, quint32>(const quint32 *src,
+                                                       int w, int h, int sstride,
+                                                       quint32 *dest, int dstride)
+{
+    __asm__ __volatile__(
+    "\tstmfd\tsp!, {r4, r5, r6, r7, r8, r9, r10, lr}\n"
+            "\tsub\tr5, r2, #1\n"
+            "\tldr\tr2, [sp, #36]\n"
+            "\tmul\tr4, r5, r3\n"
+            "\tadd\tr4, r0, r4\n"
+            "\tcmp\tr5, #0\n"
+            "\tblt\tLOOP2\n"
+            "\trsb\tr7, r3, #0\n"
+            "\tldr\tr6, [sp, #32]\n"
+            "LOOP4:\n"
+            "\tmov\tr3, r6\n"
+            "\tmov\tr0, r4\n"
+            "\n"
+            "\tstmfd\tsp!, {r4, r5, r6, r7}\n"
+            "\tmov lr, #0\n"
+            "LOOP3:\n"
+            "\tldmia\tr0!, {r4-r10, ip}\n"
+            "\tstr\tr4, [r3], r2\n"
+            "\tstr\tr5, [r3], r2\n"
+            "\tstr\tr6, [r3], r2\n"
+            "\tstr\tr7, [r3], r2\n"
+            "\tstr\tr8, [r3], r2\n"
+            "\tstr\tr9, [r3], r2\n"
+            "\tstr\tr10, [r3], r2\n"
+            "\tstr\tip, [r3], r2\n"
+            "\tadd\tlr, lr, #8\n"
+            "\tcmp\tr1, lr\n"
+            "\tbgt\tLOOP3\n"
+            "\tldmfd\tsp!, {r4, r5, r6, r7}\n"
+            "\n"
+            "\tadd\tr4, r4, r7\n"
+            "\tsub\tr5, r5, #1\n"
+            "\tadd\tr6, r6, #4\n"
+            "\tcmn\tr5, #1\n"
+            "\tbne\tLOOP4\n"
+            "LOOP2:\n"
+            "\tldmfd\tsp!, {r4, r5, r6, r7, r8, r9, r10, lr}"
+    );
+}
+
 #if QT_ROTATION_ALGORITHM == QT_ROTATION_CACHEDWRITE
 
 template <class DST, class SRC>
@@ -523,6 +570,10 @@ inline void qt_memrotate90_template<quint18, quint32>(const quint32 *src,
                                                    srcStride, dest, dstStride);
 #endif
 }
+
+
+
+
 
 #define QT_IMPL_MEMROTATE(srctype, desttype)                        \
 void qt_memrotate90(const srctype *src, int w, int h, int sstride,  \

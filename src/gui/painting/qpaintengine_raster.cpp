@@ -1808,7 +1808,9 @@ void QRasterPaintEngine::fillRect(const QRectF &r, const QBrush &brush)
     ensureBrush(brush);
     if (!s->brushData.blend)
         return;
-
+    if ((brush.color().rgba() & 0xff000000) == 0) {
+        return;
+    }
     fillRect(r, &s->brushData);
 }
 
@@ -1824,8 +1826,7 @@ void QRasterPaintEngine::fillRect(const QRectF &r, const QColor &color)
     QRasterPaintEngineState *s = state();
 
     d->solid_color_filler.solid.color = PREMUL(ARGB_COMBINE_ALPHA(color.rgba(), s->intOpacity));
-    if ((d->solid_color_filler.solid.color & 0xff000000) == 0
-        && s->composition_mode == QPainter::CompositionMode_SourceOver) {
+    if ((d->solid_color_filler.solid.color & 0xff000000) == 0) {
         return;
     }
     d->solid_color_filler.clip = d->clip();

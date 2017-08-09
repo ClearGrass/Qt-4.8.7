@@ -189,6 +189,8 @@ private Q_SLOTS:
     void pathUpdated();
 
 private:
+
+	QPointF mousePressPos;										//Jason add
     friend class QDeclarativePathViewAttached;
     Q_DISABLE_COPY(QDeclarativePathView)
     Q_DECLARE_PRIVATE_D(QGraphicsItem::d_ptr.data(), QDeclarativePathView)
