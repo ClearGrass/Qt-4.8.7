@@ -364,10 +364,6 @@ static inline void blit270(QScreen *screen, const QImage &image,
     if(g_LinuxFb != 0) {
         g_VarSI.yoffset = g_CurrentScreen * 848;
         setVarScreenInfo(g_LinuxFb, &g_VarSI);
-        if(g_CurrentScreen == 0)
-            memcpy(screen->base() + 848 * 480 * 4, screen->base(), 848 * 480);
-        else
-            memcpy(screen->base(), screen->base() + 848 * 480 * 4, 848 * 480);
         g_CurrentScreen = g_CurrentScreen == 0 ? 1 : 0;
     }
     
@@ -492,7 +488,8 @@ void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
     }
     QWSDisplay::grab();
     for (int i = 0; i < rects.size(); ++i) {
-        const QRect r = rects.at(i) & bound;
+//        const QRect r = rects.at(i) & bound;
+        QRect r = QRect(0, 0, QScreen::w, QScreen::h);
 
         QPoint dst;
         switch (trans) {
@@ -513,6 +510,7 @@ void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
 #endif
 //      func(this, image, r.translated(-topLeft), dst);
 	func(this, image, r, dst);
+        break;
     }
     QWSDisplay::ungrab();
 #ifdef QT_DEBUG_DRAW
