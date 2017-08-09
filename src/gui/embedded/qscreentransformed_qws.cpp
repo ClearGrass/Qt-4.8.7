@@ -364,6 +364,10 @@ static inline void blit270(QScreen *screen, const QImage &image,
     if(g_LinuxFb != 0) {
         g_VarSI.yoffset = g_CurrentScreen * 848;
         setVarScreenInfo(g_LinuxFb, &g_VarSI);
+        if(g_CurrentScreen == 0)
+            memcpy(screen->base() + 848 * 480 * 4, screen->base(), 848 * 480);
+        else
+            memcpy(screen->base(), screen->base() + 848 * 480 * 4, 848 * 480);
         g_CurrentScreen = g_CurrentScreen == 0 ? 1 : 0;
     }
     
