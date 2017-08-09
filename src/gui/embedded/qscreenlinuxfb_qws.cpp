@@ -283,6 +283,9 @@ QLinuxFbScreen::~QLinuxFbScreen()
     \sa disconnect()
 */
 
+extern int g_LinuxFb;
+extern struct fb_var_screeninfo g_VarSI;
+
 bool QLinuxFbScreen::connect(const QString &displaySpec)
 {
     d_ptr->displaySpec = displaySpec;
@@ -356,6 +359,8 @@ bool QLinuxFbScreen::connect(const QString &displaySpec)
         qWarning("Error reading variable information");
         return false;
     }
+    g_LinuxFb = d_ptr->fd;
+    g_VarSI = vinfo;
 
     fixupScreenInfo(finfo, vinfo);
 

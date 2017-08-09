@@ -327,6 +327,22 @@ static inline void blit180(QScreen *screen, const QImage &image,
                     dest, screen->linestep());
 }
 
+#include <linux/fb.h>
+#include <sys/ioctl.h>
+
+void setVarScreenInfo(int fh, struct fb_var_screeninfo *var)
+{
+    if(ioctl(fh, FBIOPUT_VSCREENINFO, var))
+    {
+        fprintf(stderr, "ioctl FBIOPUT_VSCREENINFO: %s\n", strerror(errno));
+        exit(1);
+    }
+}
+
+int g_LinuxFb = 0;
+struct fb_var_screeninfo g_VarSI;
+int g_CurrentScreen = 0;
+
 template <class DST, class SRC>
 static inline void blit270(QScreen *screen, const QImage &image,
                            const QRect &rect, const QPoint &topLeft)
@@ -340,8 +356,16 @@ static inline void blit270(QScreen *screen, const QImage &image,
                 + topLeft.x();
 //    DST *dest = (DST*)(screen->base() + rect.top() * screen->linestep())
 //                + rect.left();
+    if(g_LinuxFb != 0 && g_CurrentScreen == 1) {
+        dest += 848 * 480;
+    }
     qt_memrotate270(src, rect.width(), rect.height(), image.bytesPerLine(),
                     dest, screen->linestep());
+    if(g_LinuxFb != 0) {
+        g_VarSI.yoffset = g_CurrentScreen * 848;
+        setVarScreenInfo(g_LinuxFb, &g_VarSI);
+        g_CurrentScreen = g_CurrentScreen == 0 ? 1 : 0;
+    }
     
 #ifdef QT_DEBUG_DRAW
     qDebug("Image --- %p",&image);
