@@ -411,8 +411,7 @@ void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
     QRegion combineRegion = region | g_LastRegion;
 
     const QVector<QRect> rects = combineRegion.rects();
-    const QRect bound = QRect(0, 0, QScreen::w, QScreen::h)
-                        & QRect(topLeft, image.size());
+    const QRect bound = QRect(0, 0, QScreen::w, QScreen::h);
 
     BlitFunc func = 0;
 #ifdef QT_QWS_DEPTH_GENERIC
