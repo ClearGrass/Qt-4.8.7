@@ -487,7 +487,7 @@ void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
     }
     QWSDisplay::grab();
 
-    g_LastRegion = region;
+
     for (int i = 0; i < rects.size(); ++i) {
         const QRect r = rects.at(i) & bound;
 //        QRect r = QRect(0, 0, QScreen::w, QScreen::h);
@@ -514,6 +514,7 @@ void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
 //        break;
     }
     if(g_LinuxFb != 0) {
+        g_LastRegion = region;
         g_VarSI.yoffset = g_CurrentScreen * 864;
         setVarScreenInfo(g_LinuxFb, &g_VarSI);
         g_CurrentScreen = g_CurrentScreen == 0 ? 1 : 0;
