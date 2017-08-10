@@ -361,11 +361,7 @@ static inline void blit270(QScreen *screen, const QImage &image,
     }
     qt_memrotate270(src, rect.width(), rect.height(), image.bytesPerLine(),
                     dest, screen->linestep());
-    if(g_LinuxFb != 0) {
-        g_VarSI.yoffset = g_CurrentScreen * 864;
-        setVarScreenInfo(g_LinuxFb, &g_VarSI);
-        g_CurrentScreen = g_CurrentScreen == 0 ? 1 : 0;
-    }
+
     
 #ifdef QT_DEBUG_DRAW
     qDebug("Image --- %p",&image);
@@ -392,6 +388,8 @@ do {                                            \
     }                                           \
 } while (0)
 
+QRegion g_LastRegion;
+
 /*!
     \reimp
 */
@@ -410,8 +408,9 @@ void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
 #endif
         return;
     }
+    QRegion combineRegion = region | g_LastRegion;
 
-    const QVector<QRect> rects = region.rects();
+    const QVector<QRect> rects = combineRegion.rects();
     const QRect bound = QRect(0, 0, QScreen::w, QScreen::h)
                         & QRect(topLeft, image.size());
 
@@ -487,9 +486,11 @@ void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
         return;
     }
     QWSDisplay::grab();
+
+    g_LastRegion = region;
     for (int i = 0; i < rects.size(); ++i) {
-//        const QRect r = rects.at(i) & bound;
-        QRect r = QRect(0, 0, QScreen::w, QScreen::h);
+        const QRect r = rects.at(i) & bound;
+//        QRect r = QRect(0, 0, QScreen::w, QScreen::h);
 
         QPoint dst;
         switch (trans) {
@@ -511,6 +512,11 @@ void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
 //      func(this, image, r.translated(-topLeft), dst);
 	func(this, image, r, dst);
         break;
+    }
+    if(g_LinuxFb != 0) {
+        g_VarSI.yoffset = g_CurrentScreen * 864;
+        setVarScreenInfo(g_LinuxFb, &g_VarSI);
+        g_CurrentScreen = g_CurrentScreen == 0 ? 1 : 0;
     }
     QWSDisplay::ungrab();
 #ifdef QT_DEBUG_DRAW
