@@ -450,7 +450,6 @@ bool QLinuxFbScreen::connect(const QString &displaySpec)
     size = h * lstep;
 
     mapsize = finfo.smem_len;
-    qDebug("mapsize [%d]",mapsize);
 
     data = (unsigned char *)-1;
     if (d_ptr->fd != -1)
