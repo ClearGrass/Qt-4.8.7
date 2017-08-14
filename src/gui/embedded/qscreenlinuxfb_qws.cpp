@@ -288,6 +288,7 @@ extern struct fb_var_screeninfo g_VarSI;
 
 bool QLinuxFbScreen::connect(const QString &displaySpec)
 {
+    g_LinuxFb = 0;
     d_ptr->displaySpec = displaySpec;
 
     const QStringList args = displaySpec.split(QLatin1Char(':'));
@@ -450,6 +451,7 @@ bool QLinuxFbScreen::connect(const QString &displaySpec)
     size = h * lstep;
 
     mapsize = finfo.smem_len;
+    qDebug("mapsize = [%d]", mapsize);
 
     data = (unsigned char *)-1;
     dataoffset = 0;
@@ -532,6 +534,7 @@ bool QLinuxFbScreen::connect(const QString &displaySpec)
 
 void QLinuxFbScreen::disconnect()
 {
+    g_LinuxFb = 0;
     data -= dataoffset;
     if (data)
         munmap((char*)data,mapsize);
