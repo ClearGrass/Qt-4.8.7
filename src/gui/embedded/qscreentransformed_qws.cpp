@@ -512,8 +512,8 @@ void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
 	func(this, image, r, dst);
 //        break;
     }
+    g_LastRegion = region;
     if(g_LinuxFb != 0) {
-        g_LastRegion = region;
         g_VarSI.yoffset = g_CurrentScreen * 864;
         setVarScreenInfo(g_LinuxFb, &g_VarSI);
         g_CurrentScreen = g_CurrentScreen == 0 ? 1 : 0;
