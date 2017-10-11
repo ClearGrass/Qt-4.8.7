@@ -488,7 +488,8 @@ void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
 
 
     for (int i = 0; i < rects.size(); ++i) {
-        const QRect r = rects.at(i) & bound;
+//        const QRect r = rects.at(i) & bound;
+        const QRect r = bound;
 //        QRect r = QRect(0, 0, QScreen::w, QScreen::h);
 
         QPoint dst;
@@ -509,8 +510,8 @@ void QTransformedScreen::blit(const QImage &image, const QPoint &topLeft,
     qDebug("blit---func(this, image, r, dst)");
 #endif
 //      func(this, image, r.translated(-topLeft), dst);
-	func(this, image, r, dst);
-//        break;
+	    func(this, image, r, dst);
+        break;
     }
     g_LastRegion = region;
     if(g_LinuxFb != 0) {

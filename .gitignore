@@ -2,3 +2,13 @@
 /Makefile
 /config.status
 /make.sh
+
+.idea/.name
+
+*.xml
+
+*.iml
+
+*.txt
+
+src/.idea/.name
