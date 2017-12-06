@@ -125,7 +125,7 @@ public:
 
     void handleMousePressEvent(QGraphicsSceneMouseEvent *event);
     void handleMouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void handleMouseReleaseEvent(QGraphicsSceneMouseEvent *);
+    void handleMouseReleaseEvent(QGraphicsSceneMouseEvent *, bool isH = false);
 
     int calcCurrentIndex();
     void updateCurrent();

@@ -1197,15 +1197,11 @@ void QDeclarativePathView::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 		QPointF mouseReleasePos = event->pos();
 		int iTmp = (int)offset();
 		float fTmp = offset() - iTmp;
-//		qDebug() << "QDeclarativePathView::mouseReleaseEvent, offset = " << offset() << endl;
-//		qDebug() << "QDeclarativePathView::mouseReleaseEvent,(int)offset = " << iTmp << endl;
 		
-//		qDebug() << "QDeclarativePathView::mouseReleaseEvent,offset - iTmp = " << fTmp << endl;
-//        qDebug() << "QDeclarativePathView::mouseReleaseEvent, mouseReleasePos= " << mouseReleasePos << endl;
 		
-//        qDebug() << "QDeclarativePathView::mouseReleaseEvent, mousePressPos= " << mousePressPos << endl;
+        
 		if(mouseReleasePos.x() > mousePressPos.x()){
-		if(fTmp < 0.5 && fTmp > 0.3)
+		if(fTmp < 0.5 && fTmp > 0.2)
 			{
 				    //qDebug() << "QDeclarativePathView::mouseReleaseEvent, less " << endl;
 					d->setOffset(iTmp + 0.51);
@@ -1213,15 +1209,23 @@ void QDeclarativePathView::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 		}
 		else if (mouseReleasePos.x() < mousePressPos.x())
 		{
-		  if(fTmp > 0.5  && fTmp < 0.7)
+		  if(fTmp > 0.5  && fTmp < 0.8)
 		  	{
 		  	    //qDebug() << "QDeclarativePathView::mouseReleaseEvent, more " << endl;
 		  		d->setOffset(iTmp + 0.49);
 		  	}
 		}
-		
+        
+        if(mouseReleasePos.x() != mousePressPos.x())
+        {
+            d->handleMouseReleaseEvent(event, true);
+        }
+        else
+        {
+            d->handleMouseReleaseEvent(event);
+        }
+        		
 		/////////////////////////////////////////////////
-        d->handleMouseReleaseEvent(event);
         event->accept();
         ungrabMouse();
     } else {
@@ -1229,7 +1233,7 @@ void QDeclarativePathView::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
 }
 
-void QDeclarativePathViewPrivate::handleMouseReleaseEvent(QGraphicsSceneMouseEvent *)
+void QDeclarativePathViewPrivate::handleMouseReleaseEvent(QGraphicsSceneMouseEvent *event,  bool isH)
 {
     Q_Q(QDeclarativePathView);
     stealMouse = false;
@@ -1238,7 +1242,9 @@ void QDeclarativePathViewPrivate::handleMouseReleaseEvent(QGraphicsSceneMouseEve
         return;
 
     qreal elapsed = qreal(lastElapsed + QDeclarativeItemPrivate::elapsed(lastPosTime)) / 1000.;
+
     qreal velocity = elapsed > 0. ? lastDist / elapsed : 0;
+
     if (model && modelCount && qAbs(velocity) > qreal(1.)) {
         qreal count = pathItems == -1 ? modelCount : pathItems;
         if (qAbs(velocity) > count * 2) // limit velocity
@@ -1246,8 +1252,10 @@ void QDeclarativePathViewPrivate::handleMouseReleaseEvent(QGraphicsSceneMouseEve
         // Calculate the distance to be travelled
         qreal v2 = velocity*velocity;
         qreal accel = deceleration/10;
+
         // + 0.25 to encourage moving at least one item in the flick direction
         qreal dist = qMin(qreal(modelCount-1), qreal(v2 / (accel * qreal(2.0)) + qreal(0.25)));
+
         if (haveHighlightRange && highlightRangeMode == QDeclarativePathView::StrictlyEnforceRange) {
             // round to nearest item.
             if (velocity > 0.)
@@ -1261,7 +1269,15 @@ void QDeclarativePathViewPrivate::handleMouseReleaseEvent(QGraphicsSceneMouseEve
             } else {
                 accel = v2 / (2.0f * qAbs(dist));
             }
+
         }
+        //////////////////////////////////////////////////////////////////////Jason added
+        if(isH)
+        {
+            dist = dist - (int)dist;
+        }
+
+        ///////////////////////////////////////////////////////////////////////////end
         offsetAdj = qreal(0.0);
         moveOffset.setValue(offset);
         tl.accel(moveOffset, velocity, accel, dist);
